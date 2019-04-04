@@ -1,18 +1,33 @@
--- Tunnels testing
+-- tunnels (base script)
 --
--- softcut experiments
+-- experiments in stereo delay
+-- 
+-- K1 change mode
+-- K2 left lane
+-- K3 right lane
 --
+-- "I see atonal fluxes of known 
+-- forms mirrored in the 
+-- repititious composition of 
+-- the terrain."
+-- - Ed Steck, An Interface 
+-- for a Fractal Landscape
+--
+-- v1.0 @speakerdamage
 
 
+engine.name = "TestSine"
 
 --local tn = require "smalltalk/lib/tunnels"
-local tn = dofile('/home/we/dust/code/smalltalk/lib/tunnels.lua')
+local tn = dofile('/home/we/dust/code/tunnels/lib/tunnel.lua')
 
 
 
 local screen_dirty = true
 local tunnelmode = 1
-local printmode = "2 voice"
+local printmode = "highway"
+
+
 
 
 
@@ -26,18 +41,27 @@ local function udpate_tunnels(voice)
 	    softcut.position(voice, 1)
 	  if tunnelmode == 1 then
 	    softcut.play(3, 0)
+	    softcut.rec(3, 0)
 	    softcut.loop_end(voice, math.random(0, 100) * .1)
 	    softcut.pre_level(1, 0.70)
 	  elseif tunnelmode == 2 then
 	    softcut.play(3, 1)
+	    softcut.rec(3, 1)
 	    softcut.loop_end(voice, math.random(0, 100) * .1)
 	    softcut.pre_level(1, 0.70)
 	    softcut.pre_level(3, 0.70)
 	  elseif tunnelmode == 3 then
 	    softcut.play(3, 1)
+	    softcut.rec(3, 1)
 	    softcut.loop_end(voice, 1)
 	    softcut.pre_level(1, math.random(0, 100) * .01)
 	    softcut.pre_level(3, math.random(0, 100) * .01)
+	  elseif tunnelmode == 4 then
+	    softcut.play(3, 1)
+	    softcut.rec(3, 1)
+	    softcut.rate(1, 1)
+	    softcut.rate(3, 0)
+	    softcut.position(3, 0)
 	  end
 	  
 	else 
@@ -47,18 +71,27 @@ local function udpate_tunnels(voice)
 	  softcut.rate(voice, math.random(-80, 0) * .1)
 	  if tunnelmode == 1 then
 	    softcut.play(4, 0)
+	    softcut.rec(4, 0)
 	    softcut.loop_end(voice, math.random(0, 100) * .1)
 	    softcut.pre_level(2, 0.70)
 	  elseif tunnelmode == 2 then
 	    softcut.play(4, 1)
+	    softcut.rec(4, 1)
 	    softcut.loop_end(voice, math.random(0, 100) * .1)
 	    softcut.pre_level(2, 0.70)
 	    softcut.pre_level(4, 0.70)
 	  elseif tunnelmode == 3 then
 	    softcut.play(4, 1)
+	    softcut.rec(4, 1)
 	    softcut.loop_end(voice, 1)
 	    softcut.pre_level(2, math.random(0, 100) * .01)
 	    softcut.pre_level(4, math.random(0, 100) * .01)
+	  elseif tunnelmode == 4 then
+	    softcut.play(4, 1)
+	    softcut.rec(4, 1)
+	    softcut.rate(2, 1)
+	    softcut.rate(4, 0)
+	    softcut.position(4, 0)
 	  end
 	end
 end
@@ -72,6 +105,8 @@ function key(n, z)
       elseif tunnelmode == 2 then
         tunnelmode = 3
       elseif tunnelmode == 3 then
+        tunnelmode = 4
+      elseif tunnelmode == 4 then
         tunnelmode = 1
       end
       udpate_tunnels(1)
@@ -93,6 +128,7 @@ end
 
 
 function init()
+  engine.amp(0)
   params:bang()
   screen.aa(1)
   tn.init()
@@ -101,25 +137,26 @@ end
 function redraw()
   screen.clear()
   if tunnelmode == 1 then
-    printmode = "2 voice"
+    printmode = "highway"
   elseif tunnelmode == 2 then
-    printmode = "random length"
+    printmode = "disemboguement"
   elseif tunnelmode == 3 then
-    printmode = "tbd"
+    printmode = "meander"
+  elseif tunnelmode == 4 then
+    printmode = "fractal landscape"
   end
   screen.move(0,0)
 	
   screen.font_size(12)
-	screen.move(70,18)
+	screen.move(10,18)
 	
 	screen.text("tunnels")
 	screen.move(10,56)
 	screen.font_size(8)
 	screen.text(printmode)
 	screen.move(0,0)
-	--screen.text_center(rec[2] and "play" or "rec")
-	--screen.text_center(util.round(loop_len[2],0.01))
-	screen.display_png("/home/we/dust/code/smalltalk/tunnel.png", 0, 0)
+	--screen.display_png("/home/we/dust/code/smalltalk/tunnel.png", 0, 0)
+
 	screen.update()
 	
 end
