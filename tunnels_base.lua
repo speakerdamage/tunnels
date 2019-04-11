@@ -2,9 +2,8 @@
 --
 -- experiments in stereo delay
 -- 
--- K1 change mode
--- K2 left lane
--- K3 right lane
+-- K1 hold: change mode
+-- K2 & K3: change params
 --
 -- "I see atonal fluxes of known 
 -- forms mirrored in the 
@@ -27,18 +26,177 @@ local printmode = "highway"
 
 local function tunnels_pan(v)
   if v == a then
-    softcut.pan(1, math.random(50, 100) * .01)
-    softcut.pan(3, math.random(50, 100) * .01)
-  elseif v == b then
-    softcut.pan(2, math.random(1, 50) * .01)
-    softcut.pan(4, math.random(1, 50) * .01)
+    softcut.pan(1, math.random(75, 100) * .01)
+    softcut.pan(3, math.random(55, 75) * .01)
+  else
+    softcut.pan(2, math.random(0, 25) * .01)
+    softcut.pan(4, math.random(25, 45) * .01)
   end
 end
 
 local function udpate_tunnels(voice)
+  for i=1,4 do 
+    softcut.filter_dry(i, 0.125);
+	  softcut.filter_fc(i, 1200);
+	  softcut.filter_lp(i, 0);
+	  softcut.filter_bp(i, 1.0);
+	  softcut.filter_rq(i, 2.0);
+  end
+  softcut.level(5,0.0)
+  softcut.level(6,0.0)
+  softcut.level_input_cut(5, 5, 0.0)
+	softcut.level_input_cut(6, 6, 0.0)
+	softcut.rec_level(5, 0)
+	softcut.rec_level(6, 0)
+	softcut.play(5, 0)
+	softcut.play(6, 0)
 
 	-- highway
 	if tunnelmode == 1 then
+  	if voice == 1 or voice == 3 then
+  	  tunnels_pan(a)
+  	  softcut.fade_time(1, math.random(0, 6) * .1)
+  	  softcut.fade_time(3, math.random(0, 6) * .1)
+  	  softcut.rate(1, math.random(0, 80) * .1)
+  	  softcut.position(1, math.random(0, 10) * .1)
+  	  softcut.pre_level(1, math.random(0, 100) * .01)
+  	  softcut.rate(3, math.random(0, 80) * .1)
+  	  softcut.position(3, math.random(0, 10) * .1)
+  	  softcut.pre_level(3, math.random(0, 100) * .01)
+  	  softcut.filter_fc(1, math.random(800, 2000));
+  	  softcut.filter_fc(3, math.random(800, 2000));
+  	else 
+  	  tunnels_pan(b)
+  	  softcut.fade_time(2, math.random(0, 6) * .1)
+  	  softcut.fade_time(4, math.random(0, 6) * .1)
+  	  softcut.rate(2, math.random(0, 80) * .1)
+  	  softcut.position(2, math.random(0, 10) * .1)
+  	  softcut.pre_level(2, math.random(0, 100) * .01)
+  	  softcut.rate(4, math.random(0, 80) * .1)
+  	  softcut.position(4, math.random(0, 10) * .1)
+  	  softcut.pre_level(4, math.random(0, 100) * .01)
+  	  softcut.filter_fc(2, math.random(800, 2000));
+  	  softcut.filter_fc(4, math.random(800, 2000));
+  	end
+  	
+  --disemboguement	
+  elseif tunnelmode == 2 then
+    if voice == 1 or voice == 3 then
+      tunnels_pan(a)
+      softcut.fade_time(1, math.random(0, 20) * .1)
+  	  softcut.fade_time(3, math.random(0, 20) * .1)
+      softcut.position(1, math.random(0, 10) * .1)
+      softcut.position(3, math.random(0, 10) * .1)
+      softcut.loop_end(1, math.random(5, 30) * .01)
+      softcut.loop_end(3, math.random(30, 50) * .01)
+      softcut.rate(1, math.random(1, 10) * 0.1)
+      softcut.rate(3, math.random(-10, -1) * 0.1)
+      softcut.pre_level(voice, math.random(10, 80) * 0.01)
+      softcut.filter_fc(1, math.random(400, 5000))
+      softcut.filter_fc(3, math.random(400, 5000))
+    else
+      tunnels_pan(b)
+      softcut.fade_time(2, math.random(0, 20) * .1)
+  	  softcut.fade_time(4, math.random(0, 20) * .1)
+      softcut.position(2, math.random(0, 10) * .1)
+      softcut.position(4, math.random(0, 10) * .1)
+      softcut.loop_end(2, math.random(5, 30) * .01)
+      softcut.loop_end(4, math.random(30, 50) * .01)
+      softcut.rate(2, math.random(1, 10) * 0.1)
+      softcut.rate(4, math.random(-10, -1) * 0.1)
+      softcut.pre_level(2, math.random(0, 100) * .01)
+      softcut.pre_level(4, math.random(0, 100) * .01)
+      softcut.filter_fc(2, math.random(400, 5000))
+      softcut.filter_fc(4, math.random(400, 5000))
+    end
+  
+   --post-horizon
+  elseif tunnelmode == 3 then
+    softcut.rate(1, 1)
+    softcut.rate(3, -1)
+    softcut.rate(2, 1)
+    softcut.rate(4, -1)
+    if voice == 1 or voice == 3 then
+      tunnels_pan(a)
+      softcut.fade_time(1, math.random(50, 100) * .01)
+      softcut.fade_time(3, math.random(50, 100) * .01)
+      softcut.position(1, math.random(0, 10) * .1)
+      softcut.position(3, math.random(0, 10) * .1)
+      softcut.loop_end(1, math.random(50, 100) * .01)
+      softcut.loop_end(3, math.random(50, 100) * .01)
+      softcut.pre_level(voice, math.random(10, 80) * 0.01)
+      softcut.filter_bp(1, math.random(0, 100) * 0.01)
+      softcut.filter_bp(3, math.random(0, 100) * 0.01)
+      softcut.filter_fc(1, math.random(400, 5000))
+      softcut.filter_fc(3, math.random(400, 5000))
+    else
+      tunnels_pan(b)
+      softcut.fade_time(2, math.random(50, 100) * .01)
+      softcut.fade_time(4, math.random(50, 100) * .01)
+      softcut.position(2, math.random(0, 10) * .1)
+      softcut.position(4, math.random(0, 10) * .1)
+      softcut.loop_end(2, math.random(50, 100) * .01)
+      softcut.loop_end(4, math.random(50, 100) * .01)
+      softcut.pre_level(voice, math.random(10, 80) * 0.01)
+      softcut.filter_bp(2, math.random(0, 100) * 0.01)
+      softcut.filter_bp(4, math.random(0, 100) * 0.01)
+      softcut.filter_fc(2, math.random(400, 5000))
+      softcut.filter_fc(4, math.random(400, 5000))
+    end
+    
+  --coded air
+  elseif tunnelmode == 4 then
+    if voice == 1 or voice == 3 then
+      tunnels_pan(a)
+      softcut.rate(1, math.random(-100, 0) * .02)
+      softcut.rate(3, math.random(-100, 0) * .02)
+      softcut.loop_end(1, math.random(10, 500) * .01)
+      softcut.loop_end(3, math.random(10, 500) * .01)
+	    softcut.pre_level(1, math.random(50, 75) * .01)
+	    softcut.pre_level(3, math.random(0, 50) * .01)
+    else
+      tunnels_pan(b)
+      softcut.rate(2, math.random(-100, 0) * .02)
+      softcut.rate(4, math.random(-100, 0) * .02)
+      softcut.loop_end(1, math.random(10, 500) * .01)
+      softcut.loop_end(3, math.random(10, 500) * .01)
+	    softcut.pre_level(2, math.random(50, 75) * .01)
+	    softcut.pre_level(4, math.random(0, 50) * .01)
+    end
+
+  --failing lantern
+  elseif tunnelmode == 5 then
+    if voice == 1 or voice == 3 then
+      tunnels_pan(a)
+      softcut.rate(1, -8)
+      softcut.rate(3, math.random(0, 80) * .1)
+      softcut.loop_start(1, math.random(0, 50) * .01)
+      softcut.loop_end(1, 4)
+      softcut.loop_end(3, 2)
+	    softcut.pre_level(1, math.random(70, 99) * .01)
+	    softcut.pre_level(3, math.random(0, 50) * .01)
+    else
+      tunnels_pan(b)
+      softcut.rate(2, -8)
+      softcut.rate(4, math.random(0, 80) * .1)
+      softcut.loop_start(2, math.random(0, 50) * .01)
+      softcut.loop_end(2, 4)
+      softcut.loop_end(4, 2)
+	    softcut.pre_level(2, math.random(70, 99) * .01)
+	    softcut.pre_level(4, math.random(0, 50) * .01)
+    end
+    
+  -- blue cat
+	elseif tunnelmode == 6 then
+	  -- 6 voices
+	  softcut.level(5,1.0)
+    softcut.level(6,1.0)
+    softcut.level_input_cut(5, 5, 1.0)
+  	softcut.level_input_cut(6, 6, 1.0)
+  	softcut.rec_level(5, 1)
+  	softcut.rec_level(6, 1)
+  	softcut.play(5, 1)
+  	softcut.play(6, 1)
   	if voice == 1 or voice == 3 then
   	  tunnels_pan(a)
   	  softcut.fade_time(1, math.random(0, 6) * .1)
@@ -60,112 +218,29 @@ local function udpate_tunnels(voice)
   	  softcut.position(4, math.random(0, 10) * .1)
   	  softcut.pre_level(4, math.random(0, 100) * .01)
   	end
-  	
-  --disemboguement	
-  elseif tunnelmode == 2 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.fade_time(1, .5)
-      softcut.fade_time(3, .6)
-      softcut.position(voice, 1)
-      softcut.loop_end(1, math.random(5, 10) * .01)
-      softcut.loop_end(3, math.random(10, 20) * .01)
-      softcut.rate(1, 1)
-      softcut.rate(3, -1)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_fc(1, math.random(10, 12000))
-      softcut.filter_fc(3, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(1, math.random(10, 75) * .1)
-      softcut.filter_rq(3, math.random(10, 75) * .1)
-    else
-      tunnels_pan(b)
-      softcut.fade_time(2, .7)
-      softcut.fade_time(4, .8)
-      softcut.position(voice, 1)
-      softcut.loop_end(2, math.random(5, 10) * .01)
-      softcut.loop_end(4, math.random(10, 20) * .01)
-      softcut.rate(2, 1)
-      softcut.rate(4, -1)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_fc(2, math.random(10, 12000))
-      softcut.filter_fc(4, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(2, math.random(10, 75) * .1)
-      softcut.filter_rq(4, math.random(10, 75) * .1)
-    end
-  
-   --post-horizon
-  elseif tunnelmode == 3 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.fade_time(1, math.random(50, 100) * .01)
-      softcut.fade_time(3, math.random(50, 100) * .01)
-      softcut.position(1, math.random(0, 10) * .1)
-      softcut.position(3, math.random(0, 10) * .1)
-      softcut.loop_end(1, math.random(50, 100) * .01)
-      softcut.loop_end(3, math.random(50, 100) * .01)
-      softcut.rate(1, 1)
-      softcut.rate(3, -1)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_fc(1, math.random(10, 12000))
-      softcut.filter_fc(3, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(1, math.random(10, 75) * .1)
-      softcut.filter_rq(3, math.random(10, 75) * .1)
-    else
-      tunnels_pan(b)
-      softcut.fade_time(2, math.random(50, 100) * .01)
-      softcut.fade_time(4, math.random(50, 100) * .01)
-      softcut.position(2, math.random(0, 10) * .1)
-      softcut.position(4, math.random(0, 10) * .1)
-      softcut.loop_end(2, math.random(50, 100) * .01)
-      softcut.loop_end(4, math.random(50, 100) * .01)
-      softcut.rate(2, 1)
-      softcut.rate(4, -1)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_fc(2, math.random(10, 12000))
-      softcut.filter_fc(4, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(2, math.random(10, 75) * .1)
-      softcut.filter_rq(4, math.random(10, 75) * .1)
+  end
+end
+
+function enc(n, d)
+  if n == 1 then
+    if tunnelmode == 1 then
+      tunnelmode = 2
+    elseif tunnelmode == 2 then
+      tunnelmode = 3
+    elseif tunnelmode == 3 then
+      tunnelmode = 4
+    elseif tunnelmode == 4 then
+      tunnelmode = 5
+    elseif tunnelmode == 5 then
+      tunnelmode = 6
+    elseif tunnelmode == 6 then
+      tunnelmode = 1
     end
     
-  --coded air
-  elseif tunnelmode == 4 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.rate(voice, -6)
-      --softcut.rate(3, math.random(-800, 0) * .01)
-      softcut.loop_end(voice, 1)
-	    softcut.pre_level(1, math.random(70, 99) * .01)
-	    softcut.pre_level(3, math.random(0, 50) * .01)
-    else
-      tunnels_pan(b)
-      softcut.rate(voice, -6)
-      softcut.loop_end(voice, 1)
-	    softcut.pre_level(2, math.random(70, 99) * .01)
-	    softcut.pre_level(4, math.random(0, 50) * .01)
+    for i=1,4 do
+      udpate_tunnels(i)
     end
-
-  --failing lantern
-  elseif tunnelmode == 5 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.rate(voice, -6)
-      --softcut.rate(3, math.random(-800, 0) * .01)
-      softcut.loop_start(1, math.random(0, 50) * .01)
-      softcut.loop_end(voice, 4)
-	    softcut.pre_level(1, math.random(70, 99) * .01)
-	    softcut.pre_level(3, math.random(0, 50) * .01)
-    else
-      tunnels_pan(b)
-      softcut.rate(voice, -6)
-      softcut.loop_start(2, math.random(0, 50) * .01)
-      softcut.loop_end(voice, 2)
-	    softcut.pre_level(2, math.random(70, 99) * .01)
-	    softcut.pre_level(4, math.random(0, 50) * .01)
-    end
+    redraw()
   end
 end
 
@@ -173,22 +248,7 @@ end
 function key(n, z)
   if z == 1 then
     if n == 1 then
-      if tunnelmode == 1 then
-        tunnelmode = 2
-      elseif tunnelmode == 2 then
-        tunnelmode = 3
-      elseif tunnelmode == 3 then
-        tunnelmode = 4
-      elseif tunnelmode == 4 then
-        tunnelmode = 5
-      elseif tunnelmode == 5 then
-        tunnelmode = 1
-      end
-      udpate_tunnels(1)
-      udpate_tunnels(2)
-      udpate_tunnels(3)
-      udpate_tunnels(4)
-      redraw()
+      softcut.buffer_clear()
     elseif n == 2 then
       udpate_tunnels(1)
       udpate_tunnels(3)
@@ -221,6 +281,8 @@ function redraw()
     printmode = "coded air"
   elseif tunnelmode == 5 then
     printmode = "failing lantern"
+  elseif tunnelmode == 6 then
+    printmode = "blue cat"
   end
   screen.move(0,0)
 	
