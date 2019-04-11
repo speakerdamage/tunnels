@@ -18,7 +18,7 @@ local shift = 0
 local channel = 0
 local screen_dirty = true
 local tunnelmode = 1
-local printmode = "highway"
+local printmode = "fractal landscape"
 
 local function tunnels_pan(v)
   if v == a then
@@ -31,190 +31,97 @@ local function tunnels_pan(v)
 end
 
 local function udpate_tunnels(voice)
-  softcut.level(5,0.0)
-  softcut.level(6,0.0)
-  softcut.level_input_cut(5, 5, 0.0)
-	softcut.level_input_cut(6, 6, 0.0)
-	softcut.rec_level(5, 0)
-	softcut.rec_level(6, 0)
-	softcut.play(5, 0)
-	softcut.play(6, 0)
+  -- all modes
+  -- set panning
+  tunnels_pan(a)
+	tunnels_pan(b)
+	-- reset filters before changing (as some modes don't use)
+  for i=1,4 do 
+    softcut.filter_dry(i, 0.125);
+	  softcut.filter_fc(i, 1200);
+	  softcut.filter_lp(i, 0);
+	  softcut.filter_bp(i, 1.0);
+	  softcut.filter_rq(i, 2.0);
+  end
 	
-	-- highway
+	-- specific modes
+
+	-- fractal landscape
 	if tunnelmode == 1 then
-  	if voice == 1 or voice == 3 then
-  	  tunnels_pan(a)
-  	  softcut.fade_time(1, math.random(0, 6) * .1)
-  	  softcut.fade_time(3, math.random(0, 6) * .1)
-  	  softcut.rate(1, math.random(0, 80) * .1)
-  	  softcut.position(1, math.random(0, 10) * .1)
-  	  softcut.pre_level(1, math.random(0, 100) * .01)
-  	  softcut.rate(3, math.random(0, 80) * .1)
-  	  softcut.position(3, math.random(0, 10) * .1)
-  	  softcut.pre_level(3, math.random(0, 100) * .01)
-  	else 
-  	  tunnels_pan(b)
-  	  softcut.fade_time(2, math.random(0, 6) * .1)
-  	  softcut.fade_time(4, math.random(0, 6) * .1)
-  	  softcut.rate(2, math.random(0, 80) * .1)
-  	  softcut.position(2, math.random(0, 10) * .1)
-  	  softcut.pre_level(2, math.random(0, 100) * .01)
-  	  softcut.rate(4, math.random(0, 80) * .1)
-  	  softcut.position(4, math.random(0, 10) * .1)
-  	  softcut.pre_level(4, math.random(0, 100) * .01)
-  	end
+	  for i=1, 4 do
+	    softcut.fade_time(i, math.random(0, 6) * 0.1)
+  	  softcut.fade_time(i, math.random(0, 6) * 0.1)
+  	  softcut.rate(i, math.random(0, 80) * 0.1)
+  	  softcut.position(i, math.random(0, 10) * 0.1)
+  	  softcut.pre_level(i, math.random(0, 100) * 0.01)
+  	  softcut.rate(i, math.random(0, 80) * 0.1)
+  	  softcut.position(i, math.random(0, 10) * 0.1)
+  	  softcut.pre_level(i, math.random(0, 100) * 0.01)
+  	  softcut.filter_fc(i, math.random(800, 2000));
+  	  softcut.filter_fc(i, math.random(800, 2000));
+	  end
   	
   --disemboguement	
   elseif tunnelmode == 2 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.fade_time(1, math.random(0, 20) * .1)
-  	  softcut.fade_time(3, math.random(0, 20) * .1)
-      softcut.position(1, math.random(0, 10) * .1)
-      softcut.position(3, math.random(0, 10) * .1)
-      softcut.loop_end(1, math.random(5, 30) * .01)
-      softcut.loop_end(3, math.random(30, 50) * .01)
-      softcut.rate(1, math.random(1, 10) * 0.1)
-      softcut.rate(3, math.random(-10, -1) * 0.1)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_fc(1, math.random(10, 12000))
-      softcut.filter_fc(3, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(1, math.random(10, 75) * .1)
-      softcut.filter_rq(3, math.random(10, 75) * .1)
-    else
-      tunnels_pan(b)
-      softcut.fade_time(2, math.random(0, 20) * .1)
-  	  softcut.fade_time(4, math.random(0, 20) * .1)
-      softcut.position(2, math.random(0, 10) * .1)
-      softcut.position(4, math.random(0, 10) * .1)
-      softcut.loop_end(2, math.random(5, 30) * .01)
-      softcut.loop_end(4, math.random(30, 50) * .01)
-      softcut.rate(2, math.random(1, 10) * 0.1)
-      softcut.rate(4, math.random(-10, -1) * 0.1)
-      softcut.pre_level(2, math.random(0, 100) * .01)
-      softcut.pre_level(4, math.random(0, 100) * .01)
-      softcut.filter_fc(2, math.random(10, 12000))
-      softcut.filter_fc(4, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(2, math.random(10, 75) * .1)
-      softcut.filter_rq(4, math.random(10, 75) * .1)
+    for i=1, 4 do 
+      softcut.fade_time(i, math.random(0, 20) * 0.1)
+      softcut.position(i, math.random(0, 10) * 0.1)
+      softcut.pre_level(i, math.random(10, 80) * 0.01)
+      softcut.filter_fc(i, math.random(400, 5000))
+    end
+    for i=1, 2 do 
+      softcut.loop_end(i, math.random(5, 30) * 0.01)
+      softcut.rate(i, math.random(1, 10) * 0.1)
+    end
+    for i=3, 4 do 
+      softcut.loop_end(i, math.random(30, 50) * 0.01)
+      softcut.rate(i, math.random(-10, -1) * 0.1)
     end
   
    --post-horizon
   elseif tunnelmode == 3 then
-    softcut.rate(1, 1)
-    softcut.rate(3, -1)
-    softcut.rate(2, 1)
-    softcut.rate(4, -1)
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.fade_time(1, math.random(50, 100) * .01)
-      softcut.fade_time(3, math.random(50, 100) * .01)
-      softcut.position(1, math.random(0, 10) * .1)
-      softcut.position(3, math.random(0, 10) * .1)
-      softcut.loop_end(1, math.random(50, 100) * .01)
-      softcut.loop_end(3, math.random(50, 100) * .01)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_bp(1, math.random(0, 100) * 0.01)
-      softcut.filter_bp(3, math.random(0, 100) * 0.01)
-      softcut.filter_fc(1, math.random(10, 12000))
-      softcut.filter_fc(3, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(1, math.random(10, 75) * .1)
-      softcut.filter_rq(3, math.random(10, 75) * .1)
-    else
-      tunnels_pan(b)
-      softcut.fade_time(2, math.random(50, 100) * .01)
-      softcut.fade_time(4, math.random(50, 100) * .01)
-      softcut.position(2, math.random(0, 10) * .1)
-      softcut.position(4, math.random(0, 10) * .1)
-      softcut.loop_end(2, math.random(50, 100) * .01)
-      softcut.loop_end(4, math.random(50, 100) * .01)
-      softcut.pre_level(voice, math.random(10, 80) * 0.01)
-      softcut.filter_bp(2, math.random(0, 100) * 0.01)
-      softcut.filter_bp(4, math.random(0, 100) * 0.01)
-      softcut.filter_fc(2, math.random(10, 12000))
-      softcut.filter_fc(4, math.random(10, 12000))
-      softcut.filter_fc_mod(voice, math.random(0,10) * .1)
-      softcut.filter_rq(2, math.random(10, 75) * .1)
-      softcut.filter_rq(4, math.random(10, 75) * .1)
+    for i=1, 4 do 
+      softcut.fade_time(i, math.random(50, 100) * .01)
+      softcut.position(i, math.random(0, 10) * 0.1)
+      softcut.loop_end(i, math.random(10, 80) * 0.01)
+      softcut.pre_level(i, math.random(10, 80) * 0.01)
+      softcut.filter_bp(i, math.random(0, 100) * 0.01)
+      softcut.filter_fc(i, math.random(400, 5000))
     end
+    for i=1, 2 do softcut.rate(i, 1) end
+    for i=3, 4 do softcut.rate(i, -1) end
     
   --coded air
   elseif tunnelmode == 4 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.rate(1, math.random(-100, 0) * .02)
-      softcut.rate(3, math.random(-100, 0) * .02)
-      softcut.loop_end(1, math.random(10, 500) * .01)
-      softcut.loop_end(3, math.random(10, 500) * .01)
-	    softcut.pre_level(1, math.random(50, 75) * .01)
-	    softcut.pre_level(3, math.random(0, 50) * .01)
-    else
-      tunnels_pan(b)
-      softcut.rate(2, math.random(-100, 0) * .02)
-      softcut.rate(4, math.random(-100, 0) * .02)
-      softcut.loop_end(1, math.random(10, 500) * .01)
-      softcut.loop_end(3, math.random(10, 500) * .01)
-	    softcut.pre_level(2, math.random(50, 75) * .01)
-	    softcut.pre_level(4, math.random(0, 50) * .01)
+    for i=1, 4 do
+      softcut.rate(i, math.random(-100, 0) * 0.02)
+      softcut.loop_end(i, math.random(10, 500) * .01)
     end
+    for i=1, 2 do softcut.pre_level(i, math.random(50, 75) * 0.01) end
+    for i=3, 4 do softcut.pre_level(i, math.random(0, 50) * 0.01) end
 
   --failing lantern
   elseif tunnelmode == 5 then
-    if voice == 1 or voice == 3 then
-      tunnels_pan(a)
-      softcut.rate(1, -8)
-      softcut.rate(3, math.random(0, 80) * .1)
-      softcut.loop_start(1, math.random(0, 50) * .01)
-      softcut.loop_end(1, 4)
-      softcut.loop_end(3, 2)
-	    softcut.pre_level(1, math.random(70, 99) * .01)
-	    softcut.pre_level(3, math.random(0, 50) * .01)
-    else
-      tunnels_pan(b)
-      softcut.rate(2, -8)
-      softcut.rate(4, math.random(0, 80) * .1)
-      softcut.loop_start(2, math.random(0, 50) * .01)
-      softcut.loop_end(2, 4)
-      softcut.loop_end(4, 2)
-	    softcut.pre_level(2, math.random(70, 99) * .01)
-	    softcut.pre_level(4, math.random(0, 50) * .01)
+    for i=1, 2 do
+      softcut.rate(i, -8)
+      softcut.loop_start(i, math.random(0, 50) * 0.01)
+      softcut.loop_end(i, 4)
+      softcut.pre_level(i, math.random(70, 99) * 0.01)
+    end
+    for i=3, 4 do 
+      softcut.rate(i, math.random(0, 80) * 0.1) 
+      softcut.loop_end(i, 2)
+      softcut.pre_level(i, math.random(0, 50) * 0.01)
     end
     
   -- blue cat
 	elseif tunnelmode == 6 then
-	  -- 6 voices
-	  softcut.level(5,1.0)
-    softcut.level(6,1.0)
-    softcut.level_input_cut(5, 5, 1.0)
-  	softcut.level_input_cut(6, 6, 1.0)
-  	softcut.rec_level(5, 1)
-  	softcut.rec_level(6, 1)
-  	softcut.play(5, 1)
-  	softcut.play(6, 1)
-  	if voice == 1 or voice == 3 then
-  	  tunnels_pan(a)
-  	  softcut.fade_time(1, math.random(0, 6) * .1)
-  	  softcut.fade_time(3, math.random(0, 6) * .1)
-  	  softcut.rate(1, math.random(0, 80) * .1)
-  	  softcut.position(1, math.random(0, 10) * .1)
-  	  softcut.pre_level(1, math.random(0, 100) * .01)
-  	  softcut.rate(3, math.random(0, 80) * .1)
-  	  softcut.position(3, math.random(0, 10) * .1)
-  	  softcut.pre_level(3, math.random(0, 100) * .01)
-  	else 
-  	  tunnels_pan(b)
-  	  softcut.fade_time(2, math.random(0, 6) * .1)
-  	  softcut.fade_time(4, math.random(0, 6) * .1)
-  	  softcut.rate(2, math.random(0, 80) * .1)
-  	  softcut.position(2, math.random(0, 10) * .1)
-  	  softcut.pre_level(2, math.random(0, 100) * .01)
-  	  softcut.rate(4, math.random(0, 80) * .1)
-  	  softcut.position(4, math.random(0, 10) * .1)
-  	  softcut.pre_level(4, math.random(0, 100) * .01)
-  	end
+	  for i=1, 4 do
+	    softcut.rate(i, math.random(0, 80) * 0.1)
+	    softcut.fade_time(i, math.random(0, 6) * 0.1)
+	    softcut.position(i, math.random(0, 10) * 0.1)
+	    softcut.pre_level(i, math.random(0, 100) * 0.01)
+	  end
   end
 end
 
@@ -303,30 +210,28 @@ function init()
   softcut.level(2,1.0)
   softcut.level(3,1.0)
   softcut.level(4,1.0)
-  softcut.level(5,0.0)
-  softcut.level(6,0.0)
 	softcut.level_input_cut(1, 1, 1.0)
 	softcut.level_input_cut(1, 2, 0.0)
-	softcut.level_input_cut(2, 1, 0.0)
-	softcut.level_input_cut(2, 2, 1.0)
+	softcut.level_input_cut(2, 1, 1.0)
+	softcut.level_input_cut(2, 2, 0.0)
 	softcut.level_input_cut(3, 1, 1.0)
 	softcut.level_input_cut(3, 2, 0.0)
-	softcut.level_input_cut(4, 1, 0.0)
-	softcut.level_input_cut(4, 2, 1.0)
-	softcut.level_input_cut(5, 1, 0.0)
-	softcut.level_input_cut(6, 2, 0.0)
+	softcut.level_input_cut(4, 1, 1.0)
+	softcut.level_input_cut(4, 2, 0.0)
+	softcut.level_cut_cut(1,3,.2)
+	softcut.level_cut_cut(2,4,.2)
+	softcut.level_cut_cut(4,1,.2)
+	softcut.level_cut_cut(3,2,.2)
 	softcut.pan(1, 0.9)
 	softcut.pan(2, 0.1)
 	softcut.pan(3, 0.7)
 	softcut.pan(4, 0.3)
-	softcut.pan(5, 0.3)
-	softcut.pan(6, 0.7)
 
   softcut.buffer(1, 1)
   softcut.play(1, 1)
 	softcut.rate(1, 1)
 	softcut.loop_start(1, 0)
-	softcut.loop_end(1, 1)
+	softcut.loop_end(1, 5)
 	softcut.loop(1, 1)
 	softcut.fade_time(1, 0.2)
 	softcut.rec(1, 1)
@@ -334,18 +239,12 @@ function init()
 	softcut.pre_level(1, 0.70)
 	softcut.position(1, 0)
 	softcut.enable(1, 1)
-
-	softcut.filter_dry(1, 0.125);
-	softcut.filter_fc(1, 1600);
-	softcut.filter_lp(1, 0);
-	softcut.filter_bp(1, 1.0);
-	softcut.filter_rq(1, 2.0);
 	
-	softcut.buffer(2, 1)
+	softcut.buffer(2, 2)
 	softcut.play(2, 1)
 	softcut.rate(2, 1)
 	softcut.loop_start(2, 0)
-	softcut.loop_end(2, 1)
+	softcut.loop_end(2, 4)
 	softcut.loop(2, 1)
 	softcut.fade_time(2, 0.2)
 	softcut.rec(2, 1)
@@ -354,18 +253,12 @@ function init()
 	softcut.pre_level(2, 0.65)
 	softcut.position(2, 0)
 	softcut.enable(2, 1)
-
-	softcut.filter_dry(2, 0.125);
-	softcut.filter_fc(2, 1600);
-	softcut.filter_lp(2, 0);
-	softcut.filter_bp(2, 1.0);
-	softcut.filter_rq(2, 2.0);
 	
-	softcut.buffer(3, 1)
+	softcut.buffer(3, 2)
 	softcut.play(3, 1)
 	softcut.rate(3, 2)
 	softcut.loop_start(3, 0)
-	softcut.loop_end(3, 1)
+	softcut.loop_end(3, 3)
 	softcut.loop(3, 1)
 	softcut.fade_time(3, 0.2)
 	softcut.rec(3, 1)
@@ -374,18 +267,12 @@ function init()
 	softcut.pre_level(3, 0.85)
 	softcut.position(3, .5)
 	softcut.enable(3, 1)
-
-	softcut.filter_dry(3, 0.125);
-	softcut.filter_fc(3, 1200);
-	softcut.filter_lp(3, 0);
-	softcut.filter_bp(3, 1.0);
-	softcut.filter_rq(3, 2.0);
 	
 	softcut.buffer(4, 1)
 	softcut.play(4, 1)
 	softcut.rate(4, -4)
 	softcut.loop_start(4, 0)
-	softcut.loop_end(4, 1)
+	softcut.loop_end(4, 2)
 	softcut.loop(4, 1)
 	softcut.fade_time(4, 0.2)
 	softcut.rec(4, 1)
@@ -394,59 +281,23 @@ function init()
 	softcut.pre_level(4, 0.85)
 	softcut.position(4, 0)
 	softcut.enable(4, 1)
-
-	softcut.filter_dry(4, 0.125);
-	softcut.filter_fc(4, 1200);
-	softcut.filter_lp(4, 0);
-	softcut.filter_bp(4, 1.0);
-	softcut.filter_rq(4, 2.0);
 	
-	softcut.buffer(5, 1)
-	softcut.play(5, 1)
-	softcut.rate(5, 1)
-	softcut.loop_start(5, 0)
-	softcut.loop_end(5, 2)
-	softcut.loop(5, 1)
-	softcut.fade_time(5, 0.4)
-	softcut.rec(5, 0)
-	softcut.rec_level(5, 1)
-	softcut.pre_level(5, .1)
-	softcut.position(5, 0)
-	softcut.enable(5, 1)
-	softcut.filter_bp(5, .6);
-	
-	softcut.buffer(6, 1)
-	softcut.play(6, 1)
-	softcut.rate(6, 1)
-	softcut.loop_start(6, 0)
-	softcut.loop_end(6, 2)
-	softcut.loop(6, 1)
-	softcut.fade_time(6, 0.4)
-	softcut.rec(6, 0)
-	softcut.rec_level(6, 1)
-	softcut.pre_level(6, .1)
-	softcut.position(6, 0)
-	softcut.enable(6, 1)
-	softcut.filter_bp(6, .4);
+	for i=1,4 do 
+    softcut.filter_dry(i, 0.125);
+	  softcut.filter_fc(i, 1200);
+	  softcut.filter_lp(i, 0);
+	  softcut.filter_bp(i, 1.0);
+	  softcut.filter_rq(i, 2.0);
+  end
 
   --params:add_separator()
   local p = softcut.params()
-  params:add(p[1].rate)
-  params:add(p[2].rate)
-  params:add(p[3].rate)
-  params:add(p[4].rate)
-  params:add(p[1].fade_time)
-  params:add(p[2].fade_time)
-  params:add(p[3].fade_time)
-  params:add(p[4].fade_time)
-  params:add(p[1].pre_level)
-  params:add(p[2].pre_level)
-  params:add(p[3].pre_level)
-  params:add(p[4].pre_level)
-  params:add(p[1].filter_lp)
-  params:add(p[2].filter_lp)
-  params:add(p[3].filter_lp)
-  params:add(p[4].filter_lp)
+  for i=1, 4 do
+    params:add(p[i].rate)
+    params:add(p[i].fade_time)
+    params:add(p[i].pre_level)
+    params:add(p[i].filter_lp)
+  end
   
   params:bang()
 end
@@ -570,7 +421,7 @@ function redraw()
   screen.aa(1)
   screen.line_width(1.0)
   if tunnelmode == 1 then
-    printmode = "highway"
+    printmode = "fractal landscape"
   elseif tunnelmode == 2 then
     printmode = "disemboguement"
   elseif tunnelmode == 3 then
