@@ -26,11 +26,11 @@ local printmode = "fractal landscape"
 
 local function tunnels_pan(v)
   if v == a then
-    softcut.pan(1, math.random(75, 100) * 0.01)
-    softcut.pan(3, math.random(55, 75) * 0.01)
-  else
-    softcut.pan(2, math.random(0, 25) * 0.01)
-    softcut.pan(4, math.random(25, 45) * 0.01)
+    softcut.pan(3, math.random(75, 90) * 0.01)
+    softcut.pan(1, math.random(55, 75) * 0.01)
+  elseif v == b then
+    softcut.pan(4, math.random(10, 25) * 0.01)
+    softcut.pan(2, math.random(25, 45) * 0.01)
   end
 end
 
@@ -42,6 +42,7 @@ local function udpate_tunnels(voice)
 	  softcut.filter_bp(i, 1.0);
 	  softcut.filter_rq(i, 2.0);
   end
+  -- reset voices 5 & 6
   softcut.level(5,0.0)
   softcut.level(6,0.0)
   softcut.level_input_cut(5, 5, 0.0)
@@ -58,22 +59,22 @@ local function udpate_tunnels(voice)
   	  softcut.fade_time(1, math.random(0, 6) * 0.1)
   	  softcut.fade_time(3, math.random(0, 6) * 0.1)
   	  softcut.rate(1, math.random(0, 80) * 0.1)
-  	  softcut.position(1, math.random(0, 10) * 0.1)
-  	  softcut.pre_level(1, math.random(0, 100) * 0.01)
   	  softcut.rate(3, math.random(0, 80) * 0.1)
+  	  softcut.position(1, math.random(0, 10) * 0.1)
   	  softcut.position(3, math.random(0, 10) * 0.1)
+  	  softcut.pre_level(1, math.random(0, 100) * 0.01)
   	  softcut.pre_level(3, math.random(0, 100) * 0.01)
   	  softcut.filter_fc(1, math.random(800, 2000));
   	  softcut.filter_fc(3, math.random(800, 2000));
-  	else 
+  	elseif voice == 2 or voice == 4 then 
   	  tunnels_pan(b)
   	  softcut.fade_time(2, math.random(0, 6) * 0.1)
   	  softcut.fade_time(4, math.random(0, 6) * 0.1)
   	  softcut.rate(2, math.random(0, 80) * 0.1)
-  	  softcut.position(2, math.random(0, 10) * 0.1)
-  	  softcut.pre_level(2, math.random(0, 100) * 0.01)
   	  softcut.rate(4, math.random(0, 80) * 0.1)
+  	  softcut.position(2, math.random(0, 10) * 0.1)
   	  softcut.position(4, math.random(0, 10) * 0.1)
+  	  softcut.pre_level(2, math.random(0, 100) * 0.01)
   	  softcut.pre_level(4, math.random(0, 100) * 0.01)
   	  softcut.filter_fc(2, math.random(800, 2000));
   	  softcut.filter_fc(4, math.random(800, 2000));

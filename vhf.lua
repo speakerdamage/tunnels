@@ -4,11 +4,13 @@
 -- late-night static and
 -- broken antenna frequencies
 --
+-- KEY1 hold: tv guide + clear buffers
+-- KEY2: randomize tunnels
 -- KEY3: change channel  
--- KEY1 hold: tv guide
--- ENC1: volume
--- ENC2: speed
--- ENC3: pitch
+-- 
+-- ENC1: change tunnels mode
+-- ENC2: volume
+-- ENC3: speed
 --
 -- change the channel to begin
 
@@ -20,21 +22,17 @@ local screen_dirty = true
 local tunnelmode = 1
 local printmode = "fractal landscape"
 
-local function tunnels_pan(v)
-  if v == a then
-    softcut.pan(1, math.random(75, 100) * .01)
-    softcut.pan(3, math.random(55, 75) * .01)
-  else
-    softcut.pan(2, math.random(0, 25) * .01)
-    softcut.pan(4, math.random(25, 45) * .01)
-  end
+local function tunnels_pan()
+  softcut.pan(1, math.random(75, 90) * 0.01)
+  softcut.pan(2, math.random(10, 25) * 0.01)
+  softcut.pan(3, math.random(55, 75) * 0.01)
+  softcut.pan(4, math.random(25, 45) * 0.01)
 end
 
-local function udpate_tunnels(voice)
+local function udpate_tunnels()
   -- all modes
   -- set panning
-  tunnels_pan(a)
-	tunnels_pan(b)
+  tunnels_pan()
 	-- reset filters before changing (as some modes don't use)
   for i=1,4 do 
     softcut.filter_dry(i, 0.125);
@@ -49,15 +47,11 @@ local function udpate_tunnels(voice)
 	-- fractal landscape
 	if tunnelmode == 1 then
 	  for i=1, 4 do
+	    softcut.loop_end(i, math.random(50, 500) * 0.01)
 	    softcut.fade_time(i, math.random(0, 6) * 0.1)
-  	  softcut.fade_time(i, math.random(0, 6) * 0.1)
   	  softcut.rate(i, math.random(0, 80) * 0.1)
   	  softcut.position(i, math.random(0, 10) * 0.1)
   	  softcut.pre_level(i, math.random(0, 100) * 0.01)
-  	  softcut.rate(i, math.random(0, 80) * 0.1)
-  	  softcut.position(i, math.random(0, 10) * 0.1)
-  	  softcut.pre_level(i, math.random(0, 100) * 0.01)
-  	  softcut.filter_fc(i, math.random(800, 2000));
   	  softcut.filter_fc(i, math.random(800, 2000));
 	  end
   	
@@ -218,14 +212,14 @@ function init()
 	softcut.level_input_cut(3, 2, 0.0)
 	softcut.level_input_cut(4, 1, 1.0)
 	softcut.level_input_cut(4, 2, 0.0)
-	softcut.level_cut_cut(1,3,.2)
-	softcut.level_cut_cut(2,4,.2)
-	softcut.level_cut_cut(4,1,.2)
-	softcut.level_cut_cut(3,2,.2)
-	softcut.pan(1, 0.9)
-	softcut.pan(2, 0.1)
-	softcut.pan(3, 0.7)
-	softcut.pan(4, 0.3)
+	softcut.level_cut_cut(1, 2, 0.2)
+	softcut.level_cut_cut(3, 4, 0.2)
+	softcut.level_cut_cut(4, 1, 0.2)
+	softcut.level_cut_cut(3, 2, 0.2)
+	softcut.pan(1, 0.75)
+	softcut.pan(2, 0.25)
+	softcut.pan(3, 0.6)
+	softcut.pan(4, 0.4)
 
   softcut.buffer(1, 1)
   softcut.play(1, 1)
@@ -249,7 +243,6 @@ function init()
 	softcut.fade_time(2, 0.2)
 	softcut.rec(2, 1)
 	softcut.rec_level(2, 1)
-	softcut.rec_offset(2, .25)
 	softcut.pre_level(2, 0.65)
 	softcut.position(2, 0)
 	softcut.enable(2, 1)
@@ -263,7 +256,6 @@ function init()
 	softcut.fade_time(3, 0.2)
 	softcut.rec(3, 1)
 	softcut.rec_level(3, 1)
-	softcut.rec_offset(3, .5)
 	softcut.pre_level(3, 0.85)
 	softcut.position(3, .5)
 	softcut.enable(3, 1)
@@ -277,7 +269,6 @@ function init()
 	softcut.fade_time(4, 0.2)
 	softcut.rec(4, 1)
 	softcut.rec_level(4, 1)
-	softcut.rec_offset(4, .75)
 	softcut.pre_level(4, 0.85)
 	softcut.position(4, 0)
 	softcut.enable(4, 1)
@@ -290,13 +281,13 @@ function init()
 	  softcut.filter_rq(i, 2.0);
   end
 
-  --params:add_separator()
+  params:add_separator()
   local p = softcut.params()
   for i=1, 4 do
     params:add(p[i].rate)
     params:add(p[i].fade_time)
     params:add(p[i].pre_level)
-    params:add(p[i].filter_lp)
+    params:add(p[i].filter_fc)
   end
   
   params:bang()
@@ -327,11 +318,8 @@ function enc(n, d)
     elseif tunnelmode == 6 then
       tunnelmode = 1
     end
-    udpate_tunnels(1)
-    udpate_tunnels(2)
-    udpate_tunnels(3)
-    udpate_tunnels(4)
-    redraw()
+    udpate_tunnels()
+    screen_dirty = true
   elseif n == 2 then
     params:delta("1volume", d)
     screen_dirty = true
@@ -347,10 +335,8 @@ function key(n, z)
     shift = z
     screen_dirty = true
   elseif n == 2 then
-    udpate_tunnels(1)
-    udpate_tunnels(2)
-    udpate_tunnels(3)
-    udpate_tunnels(4)
+    udpate_tunnels()
+    screen_dirty = true
   elseif n == 3 then
     if z == 1 then
       -- nothing for now
