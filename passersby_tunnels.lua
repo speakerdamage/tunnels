@@ -65,7 +65,7 @@ engine.name = "Passersby"
 
 local tunnelmode = 0
 local printmode = "tunnels off"
-local tunnelvoice
+local tunnelgroup
 
 -- Utilities
 
@@ -395,10 +395,10 @@ local function update_drift()
 end
 
 local function tunnels_pan()
-  if tunnelvoice == 1 then
+  if tunnelgroup == 1 then
     softcut.pan(1, math.random(75, 90) * 0.01)
     softcut.pan(2, math.random(10, 25) * 0.01)
-  elseif tunnelvoice == 2 then
+  elseif tunnelgroup == 2 then
     softcut.pan(3, math.random(55, 75) * 0.01)
     softcut.pan(4, math.random(25, 45) * 0.01)
   end
@@ -433,7 +433,7 @@ local function update_tunnels()
 
 	-- fractal landscape
 	elseif tunnelmode == 1 then
-	  if tunnelvoice == 1 then
+	  if tunnelgroup == 1 then
 	    for i=1, 2 do
   	    softcut.loop_end(i, math.random(50, 500) * 0.01)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
@@ -441,9 +441,8 @@ local function update_tunnels()
     	  softcut.position(i, math.random(0, 10) * 0.1)
     	  softcut.pre_level(i, math.random(0, 100) * 0.01)
     	  softcut.filter_fc(i, math.random(500, 3000));
-    	  print('a')
   	  end
-	  elseif tunnelvoice == 2 then
+	  elseif tunnelgroup == 2 then
 	    for i=3, 4 do
   	    softcut.loop_end(i, math.random(50, 500) * 0.01)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
@@ -451,13 +450,12 @@ local function update_tunnels()
     	  softcut.position(i, math.random(0, 10) * 0.1)
     	  softcut.pre_level(i, math.random(0, 100) * 0.01)
     	  softcut.filter_fc(i, math.random(500, 3000));
-    	  print('b')
   	  end
 	  end
   	
   --disemboguement	
   elseif tunnelmode == 2 then
-    if tunnelvoice == 1 then
+    if tunnelgroup == 1 then
       for i=1, 2 do 
         softcut.fade_time(i, math.random(0, 20) * 0.1)
         softcut.position(i, math.random(0, 10) * 0.1)
@@ -466,7 +464,7 @@ local function update_tunnels()
         softcut.loop_end(i, math.random(5, 30) * 0.01)
         softcut.rate(i, math.random(1, 10) * 0.1)
       end
-    elseif tunnelvoice == 2 then
+    elseif tunnelgroup == 2 then
       for i=3, 4 do 
         softcut.fade_time(i, math.random(0, 20) * 0.1)
         softcut.position(i, math.random(0, 10) * 0.1)
@@ -479,7 +477,7 @@ local function update_tunnels()
   
    --post-horizon
   elseif tunnelmode == 3 then
-    if tunnelvoice == 1 then
+    if tunnelgroup == 1 then
       for i=1, 2 do 
         softcut.rate(i, math.random(1, 10) * 0.1)
         softcut.fade_time(i, math.random(50, 100) * .01)
@@ -489,7 +487,7 @@ local function update_tunnels()
         softcut.filter_bp(i, math.random(0, 100) * 0.01)
         softcut.filter_fc(i, math.random(400, 5000))
       end
-    elseif tunnelvoice == 2 then
+    elseif tunnelgroup == 2 then
       for i=3, 4 do 
         softcut.rate(i, math.random(-10, -1) * 0.1) 
         softcut.fade_time(i, math.random(50, 100) * .01)
@@ -503,13 +501,13 @@ local function update_tunnels()
     
   --coded air
   elseif tunnelmode == 4 then
-    if tunnelvoice == 1 then
+    if tunnelgroup == 1 then
       for i=1, 2 do 
         softcut.pre_level(i, math.random(50, 75) * 0.01) 
         softcut.rate(i, math.random(-100, 0) * 0.02)
         softcut.loop_end(i, math.random(10, 500) * .01)
       end
-    elseif tunnelvoice == 2 then
+    elseif tunnelgroup == 2 then
       for i=3, 4 do 
         softcut.pre_level(i, math.random(0, 50) * 0.01) 
         softcut.rate(i, math.random(-100, 0) * 0.02)
@@ -519,14 +517,14 @@ local function update_tunnels()
     
   --failing lantern
   elseif tunnelmode == 5 then
-    if tunnelvoice == 1 then
+    if tunnelgroup == 1 then
       for i=1, 2 do
         softcut.rate(i, -8)
         softcut.loop_start(i, math.random(0, 50) * 0.01)
         softcut.loop_end(i, math.random(4, 10))
         softcut.pre_level(i, math.random(70, 99) * 0.01)
       end
-    elseif tunnelvoice == 2 then
+    elseif tunnelgroup == 2 then
       for i=3, 4 do 
         softcut.rate(i, math.random(0, 80) * 0.1) 
         softcut.loop_end(i, math.random(1,4))
@@ -536,14 +534,14 @@ local function update_tunnels()
     
   -- blue cat
 	elseif tunnelmode == 6 then
-	  if tunnelvoice == 1 then
+	  if tunnelgroup == 1 then
 	    for i=1, 2 do
   	    softcut.rate(i, math.random(0, 80) * 0.1)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
   	    softcut.position(i, math.random(0, 10) * 0.1)
   	    softcut.pre_level(i, math.random(0, 100) * 0.01)
   	  end
-	  elseif tunnelvoice == 2 then
+	  elseif tunnelgroup == 2 then
 	    for i=3, 4 do
   	    softcut.rate(i, math.random(0, 80) * 0.1)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
@@ -559,21 +557,19 @@ local function update_tunnels()
 	    softcut.loop_start(i, 0)
 	    softcut.position(i, 0)
 	  end
-	  if tunnelvoice == 1 then
+	  if tunnelgroup == 1 then
 	    for i=1, 2 do
   	    softcut.rate(i, math.random(0, 80) * 0.1)
   	    softcut.loop_end(i, math.random(10, 50) * 0.01)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
   	    softcut.pre_level(i, math.random(0, 100) * 0.01)
-  	    print('crawler a'.. i)
   	  end
-	  elseif tunnelvoice == 2 then
+	  elseif tunnelgroup == 2 then
 	    for i=3, 4 do
   	    softcut.rate(i, math.random(0, 80) * 0.1)
   	    softcut.loop_end(i, math.random(10, 50) * 0.01)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
   	    softcut.pre_level(i, math.random(0, 100) * 0.01)
-  	    print('crawler b'.. i)
   	  end
 	  end
   end
@@ -713,7 +709,7 @@ function enc(n, delta)
         tunnelmode = 0
       end
       softcut.buffer_clear()
-      tunnelvoice = 1
+      tunnelgroup = 1
       update_tunnels()
       
       screen_dirty = true
@@ -733,11 +729,11 @@ function key(n, z)
       if n == 1 then
         softcut.buffer_clear()
       elseif n == 2 then
-        tunnelvoice = 1
+        tunnelgroup = 1
         update_tunnels()
         screen_dirty = true
       elseif n == 3 then
-        tunnelvoice = 2
+        tunnelgroup = 2
         update_tunnels()
         screen_dirty = true
       end
