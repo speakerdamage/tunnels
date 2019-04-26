@@ -5,6 +5,7 @@
 -- page 1: modes
 -- page 2: control method
 --
+-- K1 (hold): clear buffers
 -- K2 & K3: randomize (manual)
 --
 -- "I see atonal fluxes of known 

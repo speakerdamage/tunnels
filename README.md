@@ -3,15 +3,17 @@ a collection of uncertain delays using norns softcut.
 
 ## Base script (no engine)
 plug an audio source into norns
-- E1: change tunnel mode
-- K1 (hold): clear buffer(s)
-- K2: randomize voices 1 & 2
-- K3: randomize voices 3 & 4
+- page 1: change tunnel mode
+- page 2: change control mode
+- K1 (hold): clear buffers
+- K2: randomize voices 1 & 2 (manual mode)
+- K3: randomize voices 3 & 4 (manual mode)
 
-## Adding tunnels (without incoming frequency read/randomize functionality) to existing scripts
+## Adding tunnels to existing scripts (NEEDS TO BE RE-WRITTEN)
+Note: requires UI library
 Add the following near the top of the existing script: 
 ```
-local tn = dofile('/home/we/dust/code/tunnels/lib/tunnel.lua')
+local tn = include('tunnels/lib/tunnel')
 local tunnelmode = 0
 local printmode = "tunnels off"
 local tunnelgroup
