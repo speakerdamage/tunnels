@@ -3,17 +3,17 @@
 local sc = {}
 
 function sc.init()
-  print("starting softcut/tunnels")
+  print("entering tunnels")
   
 	audio.level_cut(1.0)
 	audio.level_adc_cut(1)
 	audio.level_eng_cut(1)
-  softcut.level(1,1.0)
+  softcut.level(1,0.0)
   softcut.level(2,1.0)
   softcut.level(3,1.0)
   softcut.level(4,1.0)
-  softcut.level(5,0.0)
-  softcut.level(6,0.0)
+  --softcut.level(5,0.0)
+  --softcut.level(6,0.0)
 	softcut.level_input_cut(1, 1, 1.0)
 	softcut.level_input_cut(1, 2, 0.0)
 	softcut.level_input_cut(2, 1, 1.0)
@@ -22,12 +22,12 @@ function sc.init()
 	softcut.level_input_cut(3, 2, 0.0)
 	softcut.level_input_cut(4, 1, 1.0)
 	softcut.level_input_cut(4, 2, 0.0)
-	softcut.level_input_cut(5, 1, 0.0)
-	softcut.level_input_cut(6, 1, 0.0)
-	softcut.level_cut_cut(1, 2, 0.2)
-	softcut.level_cut_cut(3, 4, 0.2)
-	softcut.level_cut_cut(4, 2, 0.15)
-	softcut.level_cut_cut(3, 1, 0.15)
+	--softcut.level_input_cut(5, 1, 0.0)
+	--softcut.level_input_cut(6, 1, 0.0)
+	softcut.level_cut_cut(1, 2, 0.15)
+	softcut.level_cut_cut(3, 4, 0.15)
+	softcut.level_cut_cut(4, 1, 0.10)
+	softcut.level_cut_cut(3, 2, 0.10)
 	--softcut.level_cut_cut(1, 3, 0.2)
 	--softcut.level_cut_cut(2, 4, 0.2)
 	--softcut.level_cut_cut(4, 1, 0.2)
@@ -36,12 +36,11 @@ function sc.init()
 	softcut.pan(2, 0.25)
 	softcut.pan(3, 0.60)
 	softcut.pan(4, 0.40)
-	softcut.pan(5, 0.3)
-	softcut.pan(6, 0.7)
 
   softcut.buffer(1, 1)
   softcut.play(1, 1)
 	softcut.rate(1, 1)
+	softcut.rate_slew_time(1, .05)
 	softcut.loop_start(1, 0)
 	softcut.loop_end(1, 5)
 	softcut.loop(1, 1)
@@ -52,7 +51,7 @@ function sc.init()
 	softcut.position(1, 0)
 	softcut.enable(1, 1)
 	
-	softcut.buffer(2, 2)
+	softcut.buffer(2, 1)
 	softcut.play(2, 1)
 	softcut.rate(2, 1)
 	softcut.loop_start(2, 0)
@@ -65,7 +64,7 @@ function sc.init()
 	softcut.position(2, 0)
 	softcut.enable(2, 1)
 	
-	softcut.buffer(3, 2)
+	softcut.buffer(3, 1)
 	softcut.play(3, 1)
 	softcut.rate(3, 2)
 	softcut.loop_start(3, 0)
@@ -75,7 +74,7 @@ function sc.init()
 	softcut.rec(3, 1)
 	softcut.rec_level(3, 1)
 	softcut.pre_level(3, 0.85)
-	softcut.position(3, 0.5)
+	softcut.position(3, 0)
 	softcut.enable(3, 1)
 	
 	softcut.buffer(4, 1)
@@ -98,53 +97,25 @@ function sc.init()
 	  softcut.filter_bp(i, 1.0);
 	  softcut.filter_rq(i, 2.0);
   end
-	
-	softcut.buffer(5, 1)
-	softcut.play(5, 1)
-	softcut.rate(5, 1)
-	softcut.loop_start(5, 0)
-	softcut.loop_end(5, 2)
-	softcut.loop(5, 1)
-	softcut.fade_time(5, 0.4)
-	softcut.rec(5, 0)
-	softcut.rec_level(5, 1)
-	softcut.pre_level(5, 0.1)
-	softcut.position(5, 0)
-	softcut.enable(5, 1)
-	softcut.filter_bp(5, 0.6);
-	
-	softcut.buffer(6, 1)
-	softcut.play(6, 1)
-	softcut.rate(6, 1)
-	softcut.loop_start(6, 0)
-	softcut.loop_end(6, 2)
-	softcut.loop(6, 1)
-	softcut.fade_time(6, 0.4)
-	softcut.rec(6, 0)
-	softcut.rec_level(6, 1)
-	softcut.pre_level(6, 0.1)
-	softcut.position(6, 0)
-	softcut.enable(6, 1)
-	softcut.filter_bp(6, 0.4);
 
-  --params:add_separator()
-  local p = softcut.params()
-  params:add(p[1].rate)
-  params:add(p[2].rate)
-  params:add(p[3].rate)
-  params:add(p[4].rate)
-  params:add(p[1].fade_time)
-  params:add(p[2].fade_time)
-  params:add(p[3].fade_time)
-  params:add(p[4].fade_time)
-  params:add(p[1].pre_level)
-  params:add(p[2].pre_level)
-  params:add(p[3].pre_level)
-  params:add(p[4].pre_level)
-  params:add(p[1].filter_lp)
-  params:add(p[2].filter_lp)
-  params:add(p[3].filter_lp)
-  params:add(p[4].filter_lp)
+  params:add_separator()
+  for i=1, 4 do
+    params:add{id="delay_rate"..i, name="delay rate"..i, type="control", 
+    controlspec=controlspec.new(-8, 8, 'lin', 0, 0, ""),
+    action=function(x) softcut.rate(i,x) end}
+  
+    params:add{id="delay_feedback"..i, name="delay feedback"..i, type="control", 
+    controlspec=controlspec.new(0,1.0,'lin',0,0,""),
+    action=function(x) softcut.pre_level(i,x) end}
+  
+    params:add{id="fade_time"..i, name="fade"..i, type="control", 
+    controlspec=controlspec.new(0, 1, 'lin', 0, 0, ""),
+    action=function(x) softcut.fade_time(i,x) end}
+  
+    params:add{id="filter_fc"..i, name="filter cutoff"..i, type="control", 
+    controlspec=controlspec.new(10, 12000, 'exp', 1, 12000, "Hz"),
+    action=function(x) softcut.filter_fc(i,x) end}
+  end
 end
 
 return sc

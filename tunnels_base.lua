@@ -1,9 +1,11 @@
--- tunnels (base script)
+-- tunnels
 --
 -- experiments in stereo delay
 -- 
--- K1 hold: change mode
--- K2 & K3: change params
+-- page 1: modes
+-- page 2: control method
+--
+-- K2 & K3: randomize (manual)
 --
 -- "I see atonal fluxes of known 
 -- forms mirrored in the 
@@ -20,25 +22,32 @@ engine.name = "TestSine"
 local ControlSpec = require "controlspec"
 local MusicUtil = require "musicutil"
 local Formatters = require "formatters"
+local UI = require "ui"
+--local tn = require "lib/tunnel"
+local tn = include('lib/tunnel')
 
---local tn = require "smalltalk/lib/tunnels"
-local tn = dofile('/home/we/dust/code/tunnels/lib/tunnel.lua')
-
+local pages
 local SCREEN_FRAMERATE = 15
 local screen_dirty = true
-local tunnelmode = 0
-local printmode = "tunnels off"
-local tunnelgroup
 local current_freq = -1
 local last_freq = -1
+local tunnelgroup
+local tunnelmode = 1
+local tunnelmodes_list
+local tunnelmodes = {"off", "fractal landscape", "disemboguement", "post-horizon", "coded air", "failing lantern", "blue cat", "crawler"}
+local tunnelcontrol = 1
+local tunnelcontrols_list
+local tunnelcontrols = {"manual", "input frequency", "input amplitude"}
+
 
 local function tunnels_pan()
   if tunnelgroup == 1 then
     softcut.pan(1, math.random(75, 90) * 0.01)
-    softcut.pan(2, math.random(10, 25) * 0.01)
-  elseif tunnelgroup == 2 then
-    softcut.pan(3, math.random(55, 75) * 0.01)
     softcut.pan(4, math.random(25, 45) * 0.01)
+    
+  elseif tunnelgroup == 2 then
+    softcut.pan(2, math.random(10, 25) * 0.01)
+    softcut.pan(3, math.random(55, 75) * 0.01)
   end
 end
 
@@ -50,22 +59,25 @@ local function update_tunnels()
   for i=1,4 do 
     softcut.level(i, 1)
     softcut.filter_dry(i, 0.5)
-    params:set("filter_fc"..i, math.random(800, 1400))
 	  softcut.filter_lp(i, 0)
 	  softcut.filter_bp(i, 1.0)
 	  softcut.filter_rq(i, 2.0)
   end
+  params:set("filter_fc3", math.random(40, 80))
+  params:set("filter_fc4", math.random(80, 150))
+  params:set("filter_fc2", math.random(150, 300))
+  params:set("filter_fc1", math.random(300, 1000))
 	
 	-- specific modes
 	
 	-- delay off
-	if tunnelmode == 0 then
+	if tunnelmode == 1 then
 	  for i=1, 4 do
 	    softcut.level(i, 0)
 	  end
 
 	-- fractal landscape
-	elseif tunnelmode == 1 then
+	elseif tunnelmode == 2 then
 	  if tunnelgroup == 1 then
 	    for i=1, 2 do
 	      params:set("delay_rate"..i, math.random(0, 250) * 0.01)
@@ -73,7 +85,7 @@ local function update_tunnels()
   	    softcut.loop_end(i, math.random(50, 500) * 0.01)
     	  softcut.position(i, math.random(0, 10) * 0.1)
     	  params:set("delay_feedback"..i, math.random(10, 90) * 0.01)
-    	  params:set("filter_fc"..i, math.random(40, 1000))
+    	  params:set("filter_fc"..i, math.random(40, 1500))
   	  end
 	  elseif tunnelgroup == 2 then
 	    for i=3, 4 do
@@ -82,12 +94,12 @@ local function update_tunnels()
   	    softcut.loop_end(i, math.random(50, 500) * 0.01)
     	  softcut.position(i, math.random(0, 10) * 0.1)
     	  params:set("delay_feedback"..i, math.random(10, 90) * 0.01)
-    	  params:set("filter_fc"..i, math.random(40, 1000))
+    	  params:set("filter_fc"..i, math.random(40, 1500))
   	  end
 	  end
   	
   --disemboguement	
-  elseif tunnelmode == 2 then
+  elseif tunnelmode == 3 then
     if tunnelgroup == 1 then
       params:set("filter_fc1", math.random(40, 400))
       params:set("filter_fc2", math.random(400, 800))
@@ -111,7 +123,7 @@ local function update_tunnels()
     end
   
    --post-horizon
-  elseif tunnelmode == 3 then
+  elseif tunnelmode == 4 then
     if tunnelgroup == 1 then
       for i=1, 2 do 
         params:set("delay_rate"..i, math.random(1, 10) * 0.1)
@@ -120,7 +132,7 @@ local function update_tunnels()
         softcut.loop_end(i, math.random(100, 1000) * 0.01)
         params:set("delay_feedback"..i, math.random(10, 80) * 0.01)
         softcut.filter_bp(i, math.random(0, 100) * 0.01)
-        params:set("filter_fc"..i, math.random(400, 5000))
+        params:set("filter_fc"..i, math.random(400, 2000))
       end
     elseif tunnelgroup == 2 then
       for i=3, 4 do 
@@ -130,12 +142,12 @@ local function update_tunnels()
         softcut.loop_end(i, math.random(100, 1000) * 0.01)
         params:set("delay_feedback"..i, math.random(10, 80) * 0.01)
         softcut.filter_bp(i, math.random(0, 100) * 0.01)
-        params:set("filter_fc"..i, math.random(400, 5000))
+        params:set("filter_fc"..i, math.random(400, 2000))
       end
     end
     
   --coded air
-  elseif tunnelmode == 4 then
+  elseif tunnelmode == 5 then
     if tunnelgroup == 1 then
       for i=1, 2 do 
         params:set("delay_feedback"..i, math.random(50, 75) * 0.01)
@@ -151,24 +163,26 @@ local function update_tunnels()
     end
     
   --failing lantern
-  elseif tunnelmode == 5 then
+  elseif tunnelmode == 6 then
     if tunnelgroup == 1 then
       for i=1, 2 do
-        params:set("delay_rate"..i, -8)
-        softcut.loop_start(i, math.random(0, 50) * 0.01)
-        softcut.loop_end(i, math.random(4, 10))
-        params:set("delay_feedback"..i, math.random(70, 99) * 0.01)
+        params:set("delay_rate"..i, math.random(10, 25) * 0.1)
+        --softcut.loop_start(i, math.random(0, 50) * 0.01)
+        softcut.loop_end(i, math.random(6, 10))
+        params:set("delay_feedback"..i, math.random(10, 30) * 0.01)
+        params:set("fade_time"..i, math.random(0, 40) * 0.1)
       end
     elseif tunnelgroup == 2 then
       for i=3, 4 do 
-        params:set("delay_rate"..i, math.random(0, 80) * 0.1)
-        softcut.loop_end(i, math.random(1,4))
-        params:set("delay_feedback"..i, math.random(0, 50) * 0.01)
+        params:set("delay_rate"..i, math.random(10, 25) * 0.1)
+        softcut.loop_end(i, math.random(4,6))
+        params:set("delay_feedback"..i, math.random(10, 30) * 0.01)
+        params:set("fade_time"..i, math.random(0, 40) * 0.1)
       end
     end
     
   -- blue cat
-	elseif tunnelmode == 6 then
+	elseif tunnelmode == 7 then
 	  if tunnelgroup == 1 then
 	    for i=1, 2 do
 	      params:set("delay_rate"..i, math.random(0, 80) * 0.1)
@@ -186,23 +200,25 @@ local function update_tunnels()
 	  end
 	  
   -- crawler
-	elseif tunnelmode == 7 then
+	elseif tunnelmode == 8 then
 	  for i=1, 4 do
 	    softcut.filter_dry(i, 0.25)
 	    softcut.loop_start(i, 0)
 	    softcut.position(i, 0)
 	  end
+	  softcut.loop_end(1, .1)
+	  softcut.loop_end(2, .4)
+	  softcut.loop_end(3, .2)
+	  softcut.loop_end(4, .3)
 	  if tunnelgroup == 1 then
 	    for i=1, 2 do
-  	    params:set("delay_rate"..i, math.random(0, 80) * 0.1)
-  	    softcut.loop_end(i, math.random(10, 50) * 0.01)
+  	    params:set("delay_rate"..i, math.random(5, 15) * 0.1)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
   	    params:set("delay_feedback"..i, math.random(0, 100) * 0.01)
   	  end
 	  elseif tunnelgroup == 2 then
 	    for i=3, 4 do
-  	    params:set("delay_rate"..i, math.random(0, 80) * 0.1)
-  	    softcut.loop_end(i, math.random(10, 50) * 0.01)
+  	    params:set("delay_rate"..i, math.random(5, 15) * 0.1)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
   	    params:set("delay_feedback"..i, math.random(0, 100) * 0.01)
   	  end
@@ -212,12 +228,15 @@ end
 
 local function update_freq(freq)
   current_freq = freq
-  if current_freq > 0 then last_freq = current_freq end
-  if tunnelmode == 1 then
-    if current_freq > 200 and current_freq < 350 then 
+  if tunnelcontrol == 2 then
+    
+    if current_freq > 0 then last_freq = current_freq end
+    if current_freq > 60 and current_freq < 260 then
+      print("updating freq 1")
       tunnelgroup = 1
       update_tunnels()
-    elseif current_freq > 350 then
+    elseif current_freq > 260 then
+      print("updating freq 2")
       tunnelgroup = 2
       update_tunnels()
     end
@@ -228,35 +247,43 @@ end
 local function update_vol(cvol)
   local power = 10^2
   current_vol = math.floor(cvol * power) / power
+  if tunnelcontrol == 3 then
+    if current_vol > 0.01 then 
+      print("updating vol")
+      tunnelgroup = 1
+      update_tunnels()
+      tunnelgroup = 2
+      update_tunnels()
+    end
+  end
   screen_dirty = true
 end
 
-function enc(n, d)
+-- Encoder input
+function enc(n, delta)
+  
   if n == 1 then
-    if tunnelmode == 0 then
-        tunnelmode = 1
-    elseif tunnelmode == 1 then
-      tunnelmode = 2
-    elseif tunnelmode == 2 then
-      tunnelmode = 3
-    elseif tunnelmode == 3 then
-      tunnelmode = 4
-    elseif tunnelmode == 4 then
-      tunnelmode = 5
-    elseif tunnelmode == 5 then
-      tunnelmode = 6
-    elseif tunnelmode == 6 then
-      tunnelmode = 7
-    elseif tunnelmode == 7 then
-      tunnelmode = 0
-    end
+    -- Page scroll
+    pages:set_index_delta(util.clamp(delta, -1, 1), false)
+  end
+  
+  if pages.index == 1 then
+    tunnelmodes_list:set_index_delta(util.clamp(delta, -1, 1))
+    tunnelmode = tunnelmodes_list.index
     softcut.buffer_clear()
     tunnelgroup = 1
     update_tunnels()
     tunnelgroup = 2
     update_tunnels()
-    redraw()
+  elseif pages.index == 2 then
+    if n == 2 then
+      tunnelcontrols_list:set_index_delta(util.clamp(delta, -1, 1))
+      tunnelcontrol = tunnelcontrols_list.index
+    end
+    
   end
+  
+  screen_dirty = true
 end
 
 -- Key input
@@ -279,6 +306,9 @@ end
 
 function init()
   engine.amp(0)
+  pages = UI.Pages.new(1, 2)
+  tunnelmodes_list = UI.ScrollingList.new(8, 8, 1, tunnelmodes)
+  tunnelcontrols_list = UI.ScrollingList.new(8, 8, 1, tunnelcontrols)
   
   params:add{type = "option", id = "in_channel", name = "In Channel", options = {"Left", "Right"}}
   params:add{type = "option", id = "note", name = "Note", options = MusicUtil.NOTE_NAMES, default = 10, action = function(value)
@@ -315,14 +345,14 @@ function init()
   end)
   pitch_amp_l:start()
   
-  local screen_refresh_metro = metro.init()
+  -- Start drawing to screen
+  screen_refresh_metro = metro.init()
   screen_refresh_metro.event = function()
     if screen_dirty then
       screen_dirty = false
       redraw()
     end
   end
-  
   screen_refresh_metro:start(1 / SCREEN_FRAMERATE)
   screen.aa(1)
   tn.init()
@@ -330,51 +360,13 @@ end
 
 function redraw()
   screen.clear()
-  
-  local note_num = MusicUtil.freq_to_note_num(last_freq)
-  local freq_x
-  
-  
-
-  if last_freq > 0 then
-    screen.move(80, 19)
-    screen.text(Formatters.format_freq_raw(last_freq))
-  end
-  
-  if tunnelmode == 0 then
-    printmode = "tunnels off"
-  elseif tunnelmode == 1 then
-    printmode = "fractal landscape"
-  elseif tunnelmode == 2 then
-    printmode = "disemboguement"
-  elseif tunnelmode == 3 then
-    printmode = "post-horizon"
-  elseif tunnelmode == 4 then
-    printmode = "coded air"
-  elseif tunnelmode == 5 then
-    printmode = "failing lantern"
-  elseif tunnelmode == 6 then
-    printmode = "blue cat"
-  elseif tunnelmode == 7 then
-    printmode = "crawler"
-  end
-  screen.move(0,0)
-	
-  screen.font_size(12)
-	screen.move(10,18)
-	
+	screen.move(88,10)
 	screen.text("tunnels")
-	screen.move(10,36)
-	screen.font_size(8)
-	screen.text(printmode)
-	screen.move(10,56)
-	screen.text(params:get("delay_rate1"))
-	screen.move(35,56)
-  screen.text(params:get("delay_rate2"))
-  screen.move(60,56)
-  screen.text(params:get("delay_rate3"))
-  screen.move(85,56)
-  screen.text(params:get("delay_rate4"))
+  pages:redraw()
+  if pages.index == 1 then
+    tunnelmodes_list:redraw()
+  elseif pages.index == 2 then
+    tunnelcontrols_list:redraw()
+  end
 	screen.update()
-	
 end
