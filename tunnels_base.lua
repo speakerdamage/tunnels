@@ -55,7 +55,7 @@ local function update_tunnels()
   -- set panning
   tunnels_pan()
     
-	-- reset filters before changing (as some modes don't use)
+	-- reset filters before changing (some modes don't use)
   for i=1,4 do 
     softcut.level(i, 1)
     softcut.filter_dry(i, 0.5)
@@ -70,7 +70,7 @@ local function update_tunnels()
 	
 	-- specific modes
 	
-	-- delay off
+	-- off
 	if tunnelmode == 1 then
 	  for i=1, 4 do
 	    softcut.level(i, 0)
@@ -268,13 +268,15 @@ function enc(n, delta)
   end
   
   if pages.index == 1 then
-    tunnelmodes_list:set_index_delta(util.clamp(delta, -1, 1))
-    tunnelmode = tunnelmodes_list.index
-    softcut.buffer_clear()
-    tunnelgroup = 1
-    update_tunnels()
-    tunnelgroup = 2
-    update_tunnels()
+    if n == 2 then
+      tunnelmodes_list:set_index_delta(util.clamp(delta, -1, 1))
+      tunnelmode = tunnelmodes_list.index
+      softcut.buffer_clear()
+      tunnelgroup = 1
+      update_tunnels()
+      tunnelgroup = 2
+      update_tunnels()
+    end
   elseif pages.index == 2 then
     if n == 2 then
       tunnelcontrols_list:set_index_delta(util.clamp(delta, -1, 1))
