@@ -1,9 +1,11 @@
 -- tunnels
---
+-- v1.0 @speakerdamage
 -- experiments in stereo delay
+-- ---------------------
 -- 
--- page 1: modes
--- page 2: control method
+-- page 2: modes
+-- page 3: control method
+-- page 4: inputs
 --
 -- K1 (hold): clear buffers
 -- K2 & K3: randomize (manual)
@@ -15,8 +17,9 @@
 -- - Ed Steck, An Interface 
 -- for a Fractal Landscape
 --
--- v1.0 @speakerdamage
-
+--
+-- please add and share 
+-- new modes
 
 engine.name = "TestSine"
 
@@ -39,7 +42,9 @@ local tunnelmodes = {"off", "fractal landscape", "disemboguement", "post-horizon
 local tunnelcontrol = 1
 local tunnelcontrols_list
 local tunnelcontrols = {"manual", "input frequency", "input amplitude"}
-
+local tunnelinput = 1
+local tunnelinput_list
+local tunnelinputs = {"one lane", "two lanes"}
 
 local function tunnels_pan()
   if tunnelgroup == 1 then
@@ -233,11 +238,9 @@ local function update_freq(freq)
     
     if current_freq > 0 then last_freq = current_freq end
     if current_freq > 60 and current_freq < 260 then
-      print("updating freq 1")
       tunnelgroup = 1
       update_tunnels()
     elseif current_freq > 260 then
-      print("updating freq 2")
       tunnelgroup = 2
       update_tunnels()
     end
@@ -250,12 +253,43 @@ local function update_vol(cvol)
   current_vol = math.floor(cvol * power) / power
   if tunnelcontrol == 3 then
     if current_vol > 0.01 then 
-      print("updating vol")
       tunnelgroup = 1
       update_tunnels()
       tunnelgroup = 2
       update_tunnels()
     end
+  end
+  screen_dirty = true
+end
+
+local function update_input(val)
+  if val == 1 then
+    -- mono
+    softcut.level_input_cut(1, 1, 1.0)
+	  softcut.level_input_cut(1, 2, 0.0)
+	  softcut.level_input_cut(2, 1, 1.0)
+	  softcut.level_input_cut(2, 2, 0.0)
+	  softcut.level_input_cut(3, 1, 1.0)
+	  softcut.level_input_cut(3, 2, 0.0)
+	  softcut.level_input_cut(4, 1, 1.0)
+	  softcut.level_input_cut(4, 2, 0.0)
+	  for i = 1, 4 do
+	    softcut.buffer(i, 1)
+	  end
+  elseif val == 2 then
+    -- stereo
+    softcut.level_input_cut(1, 1, 1.0)
+  	softcut.level_input_cut(1, 2, 0.0)
+  	softcut.level_input_cut(2, 1, 0.0)
+  	softcut.level_input_cut(2, 2, 1.0)
+  	softcut.level_input_cut(3, 1, 1.0)
+  	softcut.level_input_cut(3, 2, 0.0)
+  	softcut.level_input_cut(4, 1, 0.0)
+  	softcut.level_input_cut(4, 2, 1.0)
+  	softcut.buffer(1, 1)
+  	softcut.buffer(2, 2)
+  	softcut.buffer(3, 1)
+  	softcut.buffer(4, 2)
   end
   screen_dirty = true
 end
@@ -268,24 +302,28 @@ function enc(n, delta)
     pages:set_index_delta(util.clamp(delta, -1, 1), false)
   end
   
-  if pages.index == 1 then
+  if pages.index == 2 then
     if n == 2 then
       tunnelmodes_list:set_index_delta(util.clamp(delta, -1, 1))
       tunnelmode = tunnelmodes_list.index
-      softcut.buffer_clear()
+      --softcut.buffer_clear()
       tunnelgroup = 1
       update_tunnels()
       tunnelgroup = 2
       update_tunnels()
     end
-  elseif pages.index == 2 then
+  elseif pages.index == 3 then
     if n == 2 then
       tunnelcontrols_list:set_index_delta(util.clamp(delta, -1, 1))
       tunnelcontrol = tunnelcontrols_list.index
     end
-    
+  elseif pages.index == 4 then
+    if n == 2 then
+      tunnelinput_list:set_index_delta(util.clamp(delta, -1, 1))
+      tunnelinput = tunnelinput_list.index
+      update_input(tunnelinput)
+    end
   end
-  
   screen_dirty = true
 end
 
@@ -309,9 +347,10 @@ end
 
 function init()
   engine.amp(0)
-  pages = UI.Pages.new(1, 2)
+  pages = UI.Pages.new(1, 4)
   tunnelmodes_list = UI.ScrollingList.new(8, 8, 1, tunnelmodes)
   tunnelcontrols_list = UI.ScrollingList.new(8, 8, 1, tunnelcontrols)
+  tunnelinput_list = UI.ScrollingList.new(8, 8, 1, tunnelinputs)
   
   params:add{type = "option", id = "in_channel", name = "In Channel", options = {"Left", "Right"}}
   params:add{type = "option", id = "note", name = "Note", options = MusicUtil.NOTE_NAMES, default = 10, action = function(value)
@@ -357,19 +396,36 @@ function init()
     end
   end
   screen_refresh_metro:start(1 / SCREEN_FRAMERATE)
-  screen.aa(1)
   tn.init()
 end
 
 function redraw()
   screen.clear()
-	screen.move(88,10)
+  screen.level(6)
+  
+  screen.font_size(10)
+  screen.font_face(22)
+	screen.move(80,10)
 	screen.text("tunnels")
+	screen.font_size(6)
+  screen.font_face(25)
   pages:redraw()
   if pages.index == 1 then
-    tunnelmodes_list:redraw()
+    screen.font_size(10)
+    screen.font_face(22)
+    screen.move(8,30)
+    screen.level(2)
+    screen.text("enter the")
+    screen.move(8,40)
+    screen.level(6)
+    screen.text("mirrored terrain")
+    screen.fill()
   elseif pages.index == 2 then
+    tunnelmodes_list:redraw()
+  elseif pages.index == 3 then
     tunnelcontrols_list:redraw()
+  elseif pages.index == 4 then
+    tunnelinput_list:redraw()
   end
 	screen.update()
 end
