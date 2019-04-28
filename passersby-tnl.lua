@@ -9,6 +9,10 @@
 -- K3 : Change tab
 -- E2/3 : Adjust parameters
 --
+-- Tunnels page
+-- K1 (hold): clear buffer
+-- K2/K3: randomize params
+-- tunnels v1.1 @speakerdamage
 
 local MusicUtil = require "musicutil"
 local UI = require "ui"
@@ -267,15 +271,9 @@ end
 
 -- tunnels
 local function update_tunnels()
-  --tn.test()
-  --print(tunnelmode)
-  tm = tunnelmode
-  tg = tgroup
+  local tm = tunnelmode
+  local tg = tgroup
   tn.randomize(tm, tg)
-end
-
-local function tunnels_pan()
-  tn.pan()
 end
 
 -- Updaters
