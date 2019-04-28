@@ -9,4 +9,10 @@ plug an audio source into norns
 - K1 (hold): clear buffers
 - K2 & K3: randomize voices/panning (manual mode)
 
+## passersby-tnl
+one buffer, manual control only version of tunnels added to Passersby (https://llllllll.co/t/21089)
+- page 5: tunnel modes
+- K2 & K3 on tunnel page: randomize params
+- K1 (hold) on tunnel page: clear buffer
+
 ## Adding tunnels to existing scripts (COMING SOON)
