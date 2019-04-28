@@ -1,6 +1,7 @@
 -- tunnels
 -- v1.1 @speakerdamage
 -- experiments in stereo delay
+-- https://llllllll.co/t/21973
 -- ---------------------
 -- 
 -- page 2: modes
