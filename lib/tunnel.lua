@@ -57,33 +57,45 @@ function tn.init()
   end
 end
 
+function tn.reset()
+  -- reset filters before changing (some modes don't use)
+  for i=1,4 do 
+    softcut.level(i, 1)
+    softcut.loop_start(i, 0)
+    softcut.loop_end(i, i+1)
+	  softcut.position(i, 0)
+    softcut.rec_offset(i,-0.00015)
+    softcut.filter_dry(i, 0.5)
+	  softcut.filter_lp(i, 0)
+	  softcut.filter_bp(i, 1.0)
+	  softcut.filter_rq(i, 2.0)
+	  softcut.filter_fc_mod(i, 0)
+	  softcut.level_slew_time(i,0.001)
+    softcut.rate_slew_time(i,0.001)
+    softcut.phase_quant(i,1)
+    softcut.phase_offset(i,0)
+  end
+  params:set("filter_fc3", math.random(40, 150))
+  params:set("filter_fc4", math.random(150, 300))
+  params:set("filter_fc2", math.random(300, 1000))
+  params:set("filter_fc1", math.random(1000, 1800))
+end
+
 function tn.pan(tunnelgroup)
   if tunnelgroup == 1 then
-    softcut.pan(1, math.random(75, 90) * 0.01)
-    softcut.pan(4, math.random(25, 45) * 0.01)
+    softcut.pan(1, math.random(50, 90) * -0.01)
+    softcut.pan(4, math.random(10, 45) * 0.01)
     
   elseif tunnelgroup == 2 then
-    softcut.pan(2, math.random(10, 25) * 0.01)
-    softcut.pan(3, math.random(55, 75) * 0.01)
+    softcut.pan(2, math.random(50, 90) * 0.01)
+    softcut.pan(3, math.random(10, 45) * -0.01)
   end
 end
 
 function tn.randomize(mode, tunnelgroup)
   -- set panning
   tn.pan(tunnelgroup)
-    
-	-- reset filters before changing (some modes don't use)
-  for i=1,4 do 
-    softcut.level(i, 1)
-    softcut.filter_dry(i, 0.5)
-	  softcut.filter_lp(i, 0)
-	  softcut.filter_bp(i, 1.0)
-	  softcut.filter_rq(i, 2.0)
-  end
-  params:set("filter_fc3", math.random(40, 80))
-  params:set("filter_fc4", math.random(80, 150))
-  params:set("filter_fc2", math.random(150, 300))
-  params:set("filter_fc1", math.random(300, 1000))
+  tn.reset()
 	
 	-- specific modes
 	
@@ -218,11 +230,6 @@ function tn.randomize(mode, tunnelgroup)
 	  
   -- crawler
 	elseif mode == 8 then
-	  for i=1, 4 do
-	    softcut.filter_dry(i, 0.25)
-	    softcut.loop_start(i, 0)
-	    softcut.position(i, 0)
-	  end
 	  softcut.loop_end(1, .1)
 	  softcut.loop_end(2, .4)
 	  softcut.loop_end(3, .2)
@@ -238,6 +245,63 @@ function tn.randomize(mode, tunnelgroup)
   	    params:set("delay_rate"..i, math.random(5, 15) * 0.1)
   	    softcut.fade_time(i, math.random(0, 6) * 0.1)
   	    params:set("delay_feedback"..i, math.random(0, 100) * 0.01)
+  	  end
+	  end
+  
+  -- hanging mosses
+	elseif mode == 9 then
+	  if tunnelgroup == 1 then
+	    for i=1, 2 do
+	      softcut.loop_start(i, math.random(0, 1) * 0.1)
+        softcut.loop_end(i, math.random(1, 10))
+	      softcut.position(i, math.random(0, 10) * 0.1)
+        softcut.rec_offset(i, math.random(0, 1000) * 0.1)
+  	    softcut.fade_time(i, math.random(0, 6) * 0.1)
+  	    params:set("delay_feedback"..i, math.random(5, 25) * 0.01)
+  	    softcut.rate_slew_time(i, math.random(0, 80) * 0.1)
+  	    --softcut.level_slew_time(i, math.random(0, 80) * 0.1)
+  	    softcut.phase_quant(i, math.random(0, 80) * 0.1)
+  	    params:set("filter_fc"..i, math.random(100, 1000))
+  	  end
+	  elseif tunnelgroup == 2 then
+	    for i=3, 4 do
+	      softcut.loop_start(i, math.random(0, 1) * 0.1)
+        softcut.loop_end(i, math.random(1, 10))
+	      softcut.position(i, math.random(0, 10) * 0.1)
+        softcut.rec_offset(i, math.random(0, 1000) * -0.1)
+  	    softcut.fade_time(i, math.random(0, 6) * 0.1)
+  	    params:set("delay_feedback"..i, math.random(5, 25) * 0.01)
+  	    softcut.rate_slew_time(i, math.random(0, 80) * 0.1)
+  	    --softcut.level_slew_time(i, math.random(0, 80) * 0.1)
+  	    softcut.phase_quant(i, math.random(0, 80) * 0.1)
+  	    params:set("filter_fc"..i, math.random(100, 1000))
+  	  end
+	  end
+	  
+  -- rate filter
+	elseif mode == 10 then
+	  
+	  if tunnelgroup == 1 then
+	    for i=1, 2 do
+	      params:set("delay_rate"..i, math.random(0, 250) * 0.01)
+	      params:set("fade_time"..i, math.random(0, 6) * 0.1)
+  	    softcut.loop_end(i, math.random(50, 500) * 0.01)
+    	  softcut.position(i, math.random(0, 10) * 0.1)
+    	  params:set("delay_feedback"..i, math.random(10, 90) * 0.01)
+    	  params:set("filter_fc"..i, math.random(40, 1500) * params:get("delay_rate"..i))
+    	  softcut.filter_dry(i, 0.1)
+	      softcut.filter_fc_mod(i, 0.5)
+  	  end
+	  elseif tunnelgroup == 2 then
+	    for i=3, 4 do
+	      params:set("delay_rate"..i, math.random(0, 250) * 0.01)
+	      params:set("fade_time"..i, math.random(0, 6) * 0.1)
+  	    softcut.loop_end(i, math.random(50, 500) * 0.01)
+    	  softcut.position(i, math.random(0, 10) * 0.1)
+    	  params:set("delay_feedback"..i, math.random(10, 90) * 0.01)
+    	  params:set("filter_fc"..i, math.random(40, 1500) * params:get("delay_rate"..i))
+    	  softcut.filter_dry(i, 0.1)
+	      softcut.filter_fc_mod(i, 0.5)
   	  end
 	  end
   end

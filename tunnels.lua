@@ -1,5 +1,5 @@
 -- tunnels
--- v1.1 @speakerdamage
+-- v1.2 @speakerdamage
 -- experiments in stereo delay
 -- https://llllllll.co/t/21973
 -- ---------------------
@@ -21,6 +21,7 @@
 --
 -- please add and share 
 -- new modes
+-- updated 11.14.2019
 
 engine.name = "TestSine"
 
@@ -39,7 +40,7 @@ local last_freq = -1
 local tgroup
 local tunnelmode = 1
 local tunnelmodes_list
-local tunnelmodes = {"off", "fractal landscape", "disemboguement", "post-horizon", "coded air", "failing lantern", "blue cat", "crawler"}
+local tunnelmodes = {"off", "fractal landscape", "disemboguement", "post-horizon", "coded air", "failing lantern", "blue cat", "crawler", "hanging mosses", "rate filter"}
 local tunnelcontrol = 1
 local tunnelcontrols_list
 local tunnelcontrols = {"manual", "input frequency", "input amplitude"}
